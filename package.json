@@ -1,7 +1,7 @@
 {
-  "name": "rashik-analytics-provider",
+  "name": "analytics-provider",
   "version": "1.0.0",
-  "description": "A reusable analytics provider for React applications",
+  "description": "React analytics provider for Go analytics backend",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -9,41 +9,31 @@
   ],
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build",
-    "test": "echo \"No tests specified\" && exit 0",
-    "lint": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "axios": "^1.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
-    "axios": "^1.9.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.5.3",
-    "typescript": "^5.0.0"
+    "test": "jest",
+    "prepare": "npm run build"
   },
   "keywords": [
     "analytics",
     "react",
-    "tracking"
+    "tracking",
+    "events"
   ],
-  "author": "Rashik",
+  "author": "",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/rashik/analytics-provider.git"
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "react-router-dom": ">=6.0.0"
   },
-  "bugs": {
-    "url": "https://github.com/rashik/analytics-provider/issues"
+  "dependencies": {
+    "axios": "^1.6.0"
   },
-  "homepage": "https://github.com/rashik/analytics-provider#readme",
-  "publishConfig": {
-    "access": "public"
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.4",
+    "jest": "^29.5.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/jest-dom": "^5.16.5"
   }
 }

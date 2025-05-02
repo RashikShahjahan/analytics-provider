@@ -9,7 +9,16 @@ export interface EventBase {
   referrer: string;
   user_browser: string;
   user_device: string;
-  [key: string]: any; // Allow for additional custom properties
+}
+
+export interface EventRequest {
+  service: string;
+  event: string;
+  path: string;
+  referrer: string;
+  user_browser: string;
+  user_device: string;
+  timestamp?: string;
 }
 
 export interface AnalyticsContextType {
@@ -18,11 +27,10 @@ export interface AnalyticsContextType {
 
 export interface AnalyticsProviderProps {
   children: React.ReactNode;
-  endpoint: string;
+  endpoint?: string;
   serviceName: string;
   autoTrackPageViews?: boolean;
   onError?: (error: unknown) => void;
-  customHeaders?: Record<string, string>;
 }
 
 const AnalyticsContext = createContext<AnalyticsContextType>({
@@ -33,37 +41,45 @@ export const useAnalytics = (): AnalyticsContextType => useContext(AnalyticsCont
 
 export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   children,
-  endpoint,
+  endpoint = 'https://analytics.rashik.sh/api',
   serviceName,
   autoTrackPageViews = true,
-  onError,
-  customHeaders
+  onError
 }) => {
   const location = useLocation();
   
   const trackEvent = (eventType: string, properties: Partial<EventBase> = {}) => {
-    const event: EventBase = {
-      service: serviceName,
-      event: eventType,
-      path: location.pathname,
-      referrer: document.referrer,
-      user_browser: navigator.userAgent,
-      user_device: detectDevice(),
-      ...properties
-    };
+    try {
+      const event: EventRequest = {
+        service: serviceName,
+        event: eventType,
+        path: location?.pathname || '',
+        referrer: typeof document !== 'undefined' ? document.referrer || '' : '',
+        user_browser: typeof navigator !== 'undefined' ? navigator.userAgent || '' : '',
+        user_device: typeof navigator !== 'undefined' ? detectDevice() : 'unknown',
+        ...properties,
+        timestamp: new Date().toISOString()
+      };
 
-    axios.post(endpoint, event, {
-      headers: customHeaders
-    }).catch((error: unknown) => {
-      console.error('Failed to send analytics event', error);
+      axios.post(endpoint, event)
+        .catch((error: unknown) => {
+          console.error('Failed to send analytics event', error);
+          if (onError) {
+            onError(error);
+          }
+        });
+    } catch (error) {
+      console.error('Error in trackEvent', error);
       if (onError) {
         onError(error);
       }
-    });
+    }
   };
 
   // Simple device detection
   const detectDevice = (): string => {
+    if (typeof navigator === 'undefined') return 'unknown';
+    
     const ua = navigator.userAgent;
     if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
       return 'tablet';
@@ -75,10 +91,10 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   };
 
   useEffect(() => {
-    if (autoTrackPageViews) {
+    if (autoTrackPageViews && location) {
       trackEvent('page_view');
     }
-  }, [location.pathname]);
+  }, [location?.pathname]);
 
   return (
     <AnalyticsContext.Provider value={{ trackEvent }}>

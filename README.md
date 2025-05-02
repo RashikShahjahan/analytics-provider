@@ -1,54 +1,57 @@
-# Analytics Provider
+# React Analytics Provider for Go Backend
 
-A reusable analytics tracking provider for React applications.
+This React Analytics Provider is specifically designed to work with the accompanying Go analytics server.
+
+## Features
+
+- 🔄 Automatic page view tracking
+- 📊 Custom event tracking
+- 📱 Device detection (mobile, tablet, desktop)
+- 🔌 Simple integration with React applications
 
 ## Installation
 
 ```bash
-npm install rashik-analytics-provider
-# or
-yarn add rashik-analytics-provider
+npm install analytics-provider
 ```
 
 ## Usage
 
-Wrap your application with the AnalyticsProvider:
+### Basic Setup
+
+Wrap your application with the `AnalyticsProvider`:
 
 ```jsx
-import { AnalyticsProvider } from 'rashik-analytics-provider';
-import { BrowserRouter } from 'react-router-dom';
+import { AnalyticsProvider } from 'analytics-provider';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AnalyticsProvider 
-        endpoint="https://your-analytics-api.com/events" 
-        serviceName="your-app-name"
-      >
-        <YourApp />
-      </AnalyticsProvider>
-    </BrowserRouter>
+    <AnalyticsProvider 
+      serviceName="my-app"
+      endpoint="https://analytics.rashik.sh/api" // Default endpoint
+    >
+      <YourApp />
+    </AnalyticsProvider>
   );
 }
 ```
 
-Track events in your components:
+### Tracking Events
 
 ```jsx
-import { useAnalytics } from 'rashik-analytics-provider';
+import { useAnalytics } from 'analytics-provider';
 
-function YourComponent() {
+function MyComponent() {
   const { trackEvent } = useAnalytics();
-  
+
   const handleButtonClick = () => {
-    trackEvent('button_click', { 
+    trackEvent('button_click', {
+      // Optional additional properties
       button_id: 'submit-button',
-      page_section: 'checkout'
+      action: 'form-submit'
     });
-    
-    // Then do something else...
   };
-  
+
   return (
     <button onClick={handleButtonClick}>
       Submit
@@ -57,31 +60,33 @@ function YourComponent() {
 }
 ```
 
-## Configuration Options
+## Props
 
-The AnalyticsProvider accepts the following props:
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `serviceName` | string | (required) | Identifier for your service/app |
+| `endpoint` | string | 'https://analytics.rashik.sh/api' | API endpoint for the Go analytics server |
+| `autoTrackPageViews` | boolean | true | Automatically track page views |
+| `onError` | function | undefined | Custom error handler |
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| endpoint | string | Yes | The URL of your analytics API endpoint |
-| serviceName | string | Yes | Name of your service or application |
-| autoTrackPageViews | boolean | No | Automatically track page views (default: true) |
-| onError | function | No | Custom error handler for failed API requests |
-| customHeaders | object | No | Custom headers to include with API requests |
+## Go Backend Integration
 
-## Event Structure
+This provider is designed to work specifically with the Go analytics server that implements the following API endpoints:
 
-Each tracked event includes the following data:
+- `POST /api` - Records analytics events
+- `GET /api` - Retrieves analytics events (with optional filters)
+
+The provider sends events in the format expected by the Go server:
 
 ```typescript
-{
-  service: string;      // Your app/service name
+interface EventRequest {
+  service: string;      // Service/app name
   event: string;        // Event type (e.g., 'page_view', 'button_click')
-  path: string;         // Current route path
-  referrer: string;     // Document referrer
+  path: string;         // Current page path
+  referrer: string;     // Referrer URL
   user_browser: string; // User agent string
-  user_device: string;  // Device type ('desktop', 'mobile', or 'tablet')
-  // Plus any additional properties you include
+  user_device: string;  // 'desktop', 'mobile', or 'tablet'
+  timestamp?: string;   // ISO timestamp (added automatically)
 }
 ```
 
