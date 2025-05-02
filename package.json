@@ -1,0 +1,49 @@
+{
+  "name": "rashik-analytics-provider",
+  "version": "1.0.0",
+  "description": "A reusable analytics provider for React applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "axios": "^1.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "axios": "^1.9.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.5.3",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "analytics",
+    "react",
+    "tracking"
+  ],
+  "author": "Rashik",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rashik/analytics-provider.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rashik/analytics-provider/issues"
+  },
+  "homepage": "https://github.com/rashik/analytics-provider#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
