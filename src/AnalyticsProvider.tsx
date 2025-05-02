@@ -9,6 +9,7 @@ export interface EventBase {
   referrer: string;
   user_browser: string;
   user_device: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface EventRequest {
@@ -19,10 +20,11 @@ export interface EventRequest {
   user_browser: string;
   user_device: string;
   timestamp?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AnalyticsContextType {
-  trackEvent: (eventType: string, properties?: Partial<EventBase>) => void;
+  trackEvent: (eventType: string, properties?: Partial<EventBase> | Record<string, unknown>) => void;
 }
 
 export interface AnalyticsProviderProps {
@@ -48,18 +50,43 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
 }) => {
   const location = useLocation();
   
-  const trackEvent = (eventType: string, properties: Partial<EventBase> = {}) => {
+  const trackEvent = (eventType: string, properties: Partial<EventBase> | Record<string, unknown> = {}) => {
     try {
-      const event: EventRequest = {
+      // Create a base event with required fields
+      const baseEvent: EventRequest = {
         service: serviceName,
         event: eventType,
         path: location?.pathname || '',
         referrer: typeof document !== 'undefined' ? document.referrer || '' : '',
         user_browser: typeof navigator !== 'undefined' ? navigator.userAgent || '' : '',
         user_device: typeof navigator !== 'undefined' ? detectDevice() : 'unknown',
-        ...properties,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
+
+      // Extract known properties from EventBase interface
+      const knownProps = ['service', 'event', 'path', 'referrer', 'user_browser', 'user_device'];
+      const knownProperties: Partial<EventBase> = {};
+      const metadataProperties: Record<string, unknown> = {};
+
+      // Sort properties into known fields vs metadata
+      Object.entries(properties).forEach(([key, value]) => {
+        if (knownProps.includes(key)) {
+          knownProperties[key as keyof EventBase] = value as any;
+        } else {
+          metadataProperties[key] = value;
+        }
+      });
+
+      // Merge base event with any overridden known properties
+      const event: EventRequest = {
+        ...baseEvent,
+        ...knownProperties,
+      };
+
+      // Add metadata if it's not empty
+      if (Object.keys(metadataProperties).length > 0) {
+        event.metadata = metadataProperties;
+      }
 
       axios.post(endpoint, event)
         .catch((error: unknown) => {

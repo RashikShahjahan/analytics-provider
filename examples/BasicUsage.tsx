@@ -10,7 +10,12 @@ const AnalyticsButton = () => {
   const { trackEvent } = useAnalytics();
 
   const handleClick = () => {
-    trackEvent('button_click');
+    trackEvent('button_click', {
+      // Custom properties are added to metadata
+      button_type: 'primary',
+      user_role: 'visitor',
+      interaction_id: '12345'
+    });
   };
 
   return (

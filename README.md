@@ -46,7 +46,7 @@ function MyComponent() {
 
   const handleButtonClick = () => {
     trackEvent('button_click', {
-      // Optional additional properties
+      // Additional properties will be automatically added to the metadata field
       button_id: 'submit-button',
       action: 'form-submit'
     });
@@ -87,6 +87,7 @@ interface EventRequest {
   user_browser: string; // User agent string
   user_device: string;  // 'desktop', 'mobile', or 'tablet'
   timestamp?: string;   // ISO timestamp (added automatically)
+  metadata?: Record<string, unknown>; // Additional custom properties
 }
 ```
 
