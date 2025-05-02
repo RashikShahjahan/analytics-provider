@@ -12,7 +12,7 @@ This React Analytics Provider is specifically designed to work with the accompan
 ## Installation
 
 ```bash
-npm install analytics-provider
+npm install rashik-analytics-provider
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ npm install analytics-provider
 Wrap your application with the `AnalyticsProvider`:
 
 ```jsx
-import { AnalyticsProvider } from 'analytics-provider';
+import { AnalyticsProvider } from 'rashik-analytics-provider';
 
 function App() {
   return (
@@ -39,7 +39,7 @@ function App() {
 ### Tracking Events
 
 ```jsx
-import { useAnalytics } from 'analytics-provider';
+import { useAnalytics } from 'rashik-analytics-provider';
 
 function MyComponent() {
   const { trackEvent } = useAnalytics();

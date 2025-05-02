@@ -1,17 +1,39 @@
 # Source files
-src/example.tsx
+src/
 
-# Development files
-.gitignore
+# Examples
+examples/
+
+# Configuration files
 tsconfig.json
+jest.config.js
+.prettierrc
+.eslintrc
 
-# Node modules
-node_modules/
-
-# IDE files
-.vscode/
+# Editor directories and files
 .idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# Build cache
-.cache/
-.DS_Store 
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test files
+__tests__/
+coverage/
+
+# Git related
+.git/
+.github/
+.gitignore
+
+# Built output (included via "files" in package.json)
+# dist/ 

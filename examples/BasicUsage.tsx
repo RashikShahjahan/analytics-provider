@@ -1,5 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
+// In a real application, you would import from the installed package
+// import { AnalyticsProvider, useAnalytics } from 'rashik-analytics-provider';
+// For this example, we're importing from the local source
 import { AnalyticsProvider, useAnalytics } from '../src/AnalyticsProvider';
 
 // Example component that uses analytics
