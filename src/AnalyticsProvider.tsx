@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
 
 export interface EventBase {
   service: string;
@@ -48,15 +47,16 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   autoTrackPageViews = true,
   onError
 }) => {
-  const location = useLocation();
-  
   const trackEvent = (eventType: string, properties: Partial<EventBase> | Record<string, unknown> = {}) => {
     try {
+      // Get current path from window.location since we're not using React Router
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+      
       // Create a base event with required fields
       const baseEvent: EventRequest = {
         service: serviceName,
         event: eventType,
-        path: location?.pathname || '',
+        path: currentPath,
         referrer: typeof document !== 'undefined' ? document.referrer || '' : '',
         user_browser: typeof navigator !== 'undefined' ? navigator.userAgent || '' : '',
         user_device: typeof navigator !== 'undefined' ? detectDevice() : 'unknown',
@@ -118,10 +118,25 @@ export const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({
   };
 
   useEffect(() => {
-    if (autoTrackPageViews && location) {
+    if (autoTrackPageViews) {
       trackEvent('page_view');
     }
-  }, [location?.pathname]);
+  }, [autoTrackPageViews]);
+
+  // Listen for browser navigation changes
+  useEffect(() => {
+    if (autoTrackPageViews) {
+      const handlePopState = () => {
+        trackEvent('page_view');
+      };
+      
+      window.addEventListener('popstate', handlePopState);
+      
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, [autoTrackPageViews]);
 
   return (
     <AnalyticsContext.Provider value={{ trackEvent }}>

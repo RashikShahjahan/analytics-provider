@@ -5,4 +5,6 @@ export {
   type EventRequest,
   type AnalyticsContextType, 
   type AnalyticsProviderProps 
-} from './AnalyticsProvider'; 
+} from './AnalyticsProvider';
+
+export { RouterAwareAnalyticsProvider } from './RouterAwareAnalyticsProvider'; 

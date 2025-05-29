@@ -1,6 +1,6 @@
-# React Analytics Provider for Go Backend
+# Analytics Provider
 
-This React Analytics Provider is specifically designed to work with the accompanying Go analytics server.
+A React analytics provider for tracking events and page views.
 
 ## Features
 
@@ -17,57 +17,92 @@ npm install rashik-analytics-provider
 
 ## Usage
 
-### Basic Setup
+### Basic Usage (Without React Router)
 
-Wrap your application with the `AnalyticsProvider`:
+If you're not using React Router or want to use browser navigation tracking:
 
-```jsx
-import { AnalyticsProvider } from 'rashik-analytics-provider';
+```tsx
+import { AnalyticsProvider, useAnalytics } from 'rashik-analytics-provider';
 
 function App() {
   return (
-    <AnalyticsProvider 
-      serviceName="my-app"
-      endpoint="https://analytics.rashik.sh/api" // Default endpoint
-    >
-      <YourApp />
+    <AnalyticsProvider serviceName="my-app">
+      <YourAppComponents />
     </AnalyticsProvider>
   );
 }
+
+function SomeComponent() {
+  const { trackEvent } = useAnalytics();
+  
+  const handleClick = () => {
+    trackEvent('button_click', { button_name: 'header_cta' });
+  };
+  
+  return <button onClick={handleClick}>Click me</button>;
+}
 ```
 
-### Tracking Events
+### With React Router
 
-```jsx
-import { useAnalytics } from 'rashik-analytics-provider';
+If you're using React Router and want automatic route change tracking:
 
-function MyComponent() {
-  const { trackEvent } = useAnalytics();
+```tsx
+import { BrowserRouter } from 'react-router-dom';
+import { RouterAwareAnalyticsProvider, useAnalytics } from 'rashik-analytics-provider';
 
-  const handleButtonClick = () => {
-    trackEvent('button_click', {
-      // Additional properties will be automatically added to the metadata field
-      button_id: 'submit-button',
-      action: 'form-submit'
-    });
-  };
-
+function App() {
   return (
-    <button onClick={handleButtonClick}>
-      Submit
-    </button>
+    <BrowserRouter>
+      <RouterAwareAnalyticsProvider serviceName="my-app">
+        <YourAppComponents />
+      </RouterAwareAnalyticsProvider>
+    </BrowserRouter>
   );
 }
 ```
 
-## Props
+## API
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `serviceName` | string | (required) | Identifier for your service/app |
-| `endpoint` | string | 'https://analytics.rashik.sh/api' | API endpoint for the Go analytics server |
-| `autoTrackPageViews` | boolean | true | Automatically track page views |
-| `onError` | function | undefined | Custom error handler |
+### AnalyticsProvider Props
+
+- `serviceName` (required): Name of your service
+- `endpoint` (optional): Analytics endpoint URL (defaults to 'https://analytics.rashik.sh/api')
+- `autoTrackPageViews` (optional): Whether to automatically track page views (default: true)
+- `onError` (optional): Error handler function
+
+### useAnalytics Hook
+
+Returns an object with:
+- `trackEvent(eventType: string, properties?: object)`: Function to track custom events
+
+## Troubleshooting
+
+### "useLocation() may be used only in the context of a <Router> component" Error
+
+This error occurs when using the basic `AnalyticsProvider` inside a React Router context. To fix this:
+
+1. **Option 1**: Use `RouterAwareAnalyticsProvider` instead:
+   ```tsx
+   import { RouterAwareAnalyticsProvider } from 'rashik-analytics-provider';
+   
+   <BrowserRouter>
+     <RouterAwareAnalyticsProvider serviceName="my-app">
+       <App />
+     </RouterAwareAnalyticsProvider>
+   </BrowserRouter>
+   ```
+
+2. **Option 2**: Place `AnalyticsProvider` outside the Router:
+   ```tsx
+   <AnalyticsProvider serviceName="my-app">
+     <BrowserRouter>
+       <App />
+     </BrowserRouter>
+   </AnalyticsProvider>
+   ```
+
+The `RouterAwareAnalyticsProvider` is specifically designed to work with React Router and will automatically track route changes, while the basic `AnalyticsProvider` uses browser navigation events and works without React Router.
 
 ## Go Backend Integration
 
